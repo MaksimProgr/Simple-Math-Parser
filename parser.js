@@ -30,7 +30,7 @@ var calc = function (expression) {
     [ null, /^\//, null, function(a,b,c) { return a/c; } ],
     [ null, /^\*/, null, function(a,b,c) { return a*c; } ]
     ],
-    [ // priority 4
+    [ // priority 3
     [ null, /^\^/, null, function(a,b,c) { return Math.pow(a,c); } ]
     ],
     [ // priotity 4
@@ -39,17 +39,14 @@ var calc = function (expression) {
     [ // priority 5
     [ /^\(/, null, /^\)/, function(a,b,c) { return b; } ],
     [ null, /^\s*\(/, null, /^\)/, function(a,b,c,d) { 
-      if (typeof c == 'number') return a(c); else return a.apply(null, c); } 
-    ],
+      if (typeof c == 'number') return a(c); else return a.apply(null, c); } ],
     [ /^\|/, null, /^\|/, function(a,b,c) { return Math.abs(b); } ],
     [ /^\[/, null, /^\]/, function(a,b,c) { return Math.floor(b); } ]
     ],
     [ // priority 6
     [ /^\-?\d+(\.\d+)?(e\-?\d+)?/, function(a) { return (!isNaN(parseFloat(a)) && isFinite(a)) ? parseFloat(a) : null; } ],
     [ /[a-zA-Z][a-zA-Z0-9_]*/, function(a) {
-      if (!constants[a]) {
-        throw 'reference error: '+a+' is not found';
-      }
+      if (!a in constants) throw 'reference error: '+a+' is not found';
       return constants[a]; 
     } ]
     ]
