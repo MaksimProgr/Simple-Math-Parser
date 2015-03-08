@@ -76,55 +76,55 @@ var calc = function (expression) {
     }
     
     while (true) {
-    var op = null;
-    while (!op) { 
-      for (var i = 0; i<currOperators.length; i++) {
-        var curr = currOperators[i];
-        if (processOperator(curr)) {
-          op = curr;
-          break;
-        }
-      }
-      if (!op) {
-        var deep = null;
-        if (depth<operators.length-1 && stack.length==0) {
-          deep = parse(depth+1);
-        }
-        if (deep!==null) {
-          stack.push(deep);
-        } else {
-          if (totalDepth==0 && expression.length>0) {
-            throw 'invalid token: '+expression[0];
+      var op = null;
+      while (!op) { 
+        for (var i = 0; i<currOperators.length; i++) {
+          var curr = currOperators[i];
+          if (processOperator(curr)) {
+            op = curr;
+            break;
           }
-          totalDepth--;
-          return stack.length ? stack[0]: null;
+        }
+        if (!op) {
+          var deep = null;
+          if (depth<operators.length-1 && stack.length==0) {
+            deep = parse(depth+1);
+          }
+          if (deep!==null) {
+            stack.push(deep);
+          } else {
+            if (totalDepth==0 && expression.length>0) {
+              throw 'invalid token: '+expression[0];
+            }
+            totalDepth--;
+            return stack.length ? stack[0]: null;
+          }
         }
       }
-    }
     
-    while (stack.length<op.length-1) {
-      if (!processOperator(op)) {
-        if (op[stack.length]) {
-          throw 'syntax error: unmatched '+stack[0];
+      while (stack.length<op.length-1) {
+        if (!processOperator(op)) {
+          if (op[stack.length]) {
+            throw 'syntax error: unmatched '+stack[0];
+          }
+          var trydepth = 0;
+          if (stack.length==op.length-2) {
+            trydepth = depth+1;
+          }
+          var deep = parse(trydepth);
+          if (deep===null) {
+            throw 'syntax error: '+(expression[0] || stack[0]);
+          }
+          stack.push(deep);
         }
-        var trydepth = 0;
-        if (stack.length==op.length-2) {
-          trydepth = depth+1;
-        }
-        var deep = parse(trydepth);
-        if (deep===null) {
-          throw 'syntax error: '+(expression[0] || stack[0]);
-        }
-        stack.push(deep);
       }
-    }
-    
-    var res = op[op.length-1].apply(null,stack);
-    if (res===null || op[op.length-2]) {
-      totalDepth--;
-      return res;
-    }
-    stack = [res];
+      
+      var res = op[op.length-1].apply(null,stack);
+      if (res===null || op[op.length-2]) {
+        totalDepth--;
+        return res;
+      }
+      stack = [res];
     }
   } (0);
   return parseFloat(res);
